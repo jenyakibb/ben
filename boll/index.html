@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Боровичи Роботикс — Создание роботов</title>
+    <!-- Шрифт для технологического стиля -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ГЛОБАЛЬНЫЙ СБРОС И БАЗА */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0f;
+            color: #e0e0e0;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* АНИМИРОВАННАЯ СЕТКА НА ФОНЕ */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: 
+                linear-gradient(rgba(0, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* НЕОНОВОЕ СВЕЧЕНИЕ ПО УГЛАМ */
+        .glow-orbs {
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            filter: blur(80px);
+            animation: pulseGlow 6s ease-in-out infinite alternate;
+        }
+
+        .glow-orbs.bottom {
+            top: auto;
+            bottom: -20%;
+            right: auto;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255, 0, 200, 0.12) 0%, transparent 70%);
+            animation-delay: 3s;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* КОНТЕЙНЕР — ПОВЕРХ ФОНА */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 30px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ШАПКА / НАВИГАЦИЯ */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            text-align: center;
+            line-height: 48px;
+            font-size: 28px;
+            color: #00ffff;
+            transform: rotate(10deg);
+        }
+
+        .logo span {
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #b0b0c0;
+            text-decoration: none;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ffff;
+            transition: 0.3s;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* КНОПКА ВХОДА В НАВИГАЦИИ */
+        .btn-login-nav {
+            padding: 10px 28px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 40px;
+            color: #00ffff !important;
+            font-weight: 700;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .btn-login-nav::after {
+            display: none !important;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .city-badge {
+            background: rgba(0, 255, 255, 0.12);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #00ffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ОСНОВНОЙ БЛОК — ГЕРОЙ */
+        .hero {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 0 40px;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .hero-text {
+            flex: 1 1 500px;
+        }
+
+        .hero-text .tagline {
+            display: inline-block;
+            background: rgba(255, 0, 200, 0.15);
+            border-left: 4px solid #ff00c8;
+            padding: 6px 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 14px;
+            color: #ff66d0;
+            margin-bottom: 24px;
+        }
+
+        .hero-text h1 {
+            font-size: clamp(48px, 10vw, 80px);
+            font-weight: 900;
+            line-height: 1.05;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0f0ff 50%, #00ffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .hero-text .highlight-city {
+            display: inline-block;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 0 16px;
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            border-radius: 4px;
+            -webkit-text-fill-color: #00ffff;
+            text-shadow: 0 0 40px #00ffff;
+        }
+
+        .hero-text p {
+            font-size: 20px;
+            color: #b0b8c8;
+            max-width: 560px;
+            margin: 24px 0 40px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-text p strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* КНОПКИ CTA */
+        .cta-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(135deg, #00ccff, #0088ff);
+            border: none;
+            padding: 18px 48px;
+            border-radius: 60px;
+            font-weight: 800;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #0a0a0f;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 40px rgba(0, 150, 255, 0.4);
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 0 70px rgba(0, 200, 255, 0.7);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            padding: 16px 36px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #d0d8e8;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            border-color: #00ffff;
+            color: #fff;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+
+        /* ПРАВАЯ ЧАСТЬ — 3D-РОБОТ (стилизованный) */
+        .hero-visual {
+            flex: 1 1 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 350px;
+        }
+
+        .robot-frame {
+            width: 100%;
+            max-width: 460px;
+            aspect-ratio: 1/1;
+            background: radial-gradient(circle at 30% 30%, rgba(0, 255, 255, 0.08), transparent 70%);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 0 80px rgba(0, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .robot-frame::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: conic-gradient(from 0deg, transparent, #00ffff, transparent, #ff00c8, transparent);
+            border-radius: 40px;
+            z-index: -1;
+            animation: spinBorder 8s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes spinBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .robot-emoji {
+            font-size: 140px;
+            line-height: 1;
+            filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.6));
+            animation: floatRobot 4s ease-in-out infinite;
+        }
+
+        @keyframes floatRobot {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.02); }
+        }
+
+        .robot-frame .scan-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            animation: scan 3s linear infinite;
+            box-shadow: 0 0 30px #00ffff;
+        }
+
+        @keyframes scan {
+            0% { bottom: 0; opacity: 1; }
+            50% { bottom: 100%; opacity: 0.2; }
+            100% { bottom: 0; opacity: 1; }
+        }
+
+        .robot-label {
+            position: absolute;
+            bottom: 24px;
+            font-size: 14px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            background: rgba(0,0,0,0.6);
+            padding: 6px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(0,255,255,0.2);
+        }
+
+        /* БЛОК С ПРЕИМУЩЕСТВАМИ (три колонки) */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 50px 0 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .feature-item {
+            padding: 16px 0;
+        }
+
+        .feature-item .number {
+            font-size: 42px;
+            font-weight: 900;
+            color: #00ffff;
+            opacity: 0.6;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            letter-spacing: -1px;
+        }
+
+        .feature-item h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 6px 0 8px;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .feature-item p {
+            color: #8892a8;
+            font-size: 15px;
+        }
+
+        /* ПОДВАЛ */
+        .footer {
+            margin-top: 50px;
+            padding: 30px 0 10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            color: #5a627a;
+        }
+
+        .footer .city-mark {
+            color: #00ffff;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .footer a {
+            color: #5a627a;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer a:hover {
+            color: #00ffff;
+        }
+
+        /* АДАПТИВ */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                align-items: start;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            .hero {
+                padding: 20px 0;
+            }
+            .hero-text h1 {
+                font-size: 48px;
+            }
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+            .robot-emoji {
+                font-size: 100px;
+            }
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 15px;
+            }
+            .hero-text h1 {
+                font-size: 36px;
+            }
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Фоновые слои -->
+    <div class="grid-background"></div>
+    <div class="glow-orbs"></div>
+    <div class="glow-orbs bottom"></div>
+
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div class="container">
+
+        <!-- НАВИГАЦИЯ -->
+        <header class="navbar">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span>BORO</span>ROBOTICS
+            </a>
+            <div class="nav-links">
+                <a href="robots.html">Роботы</a>
+                <a href="#">Технологии</a>
+                <a href="#">Проекты</a>
+                <a href="order.html">Заявка</a>
+                <a href="#">Контакты</a>
+                <!-- ССЫЛКА НА СТРАНИЦУ ВХОДА -->
+                <a href="login.html" class="btn-login-nav">🔐 Войти</a>
+            </div>
+            <div class="city-badge">
+                🏙️ Боровичи
+            </div>
+        </header>
+
+        <!-- ГЕРОЙ -->
+        <section class="hero">
+            <div class="hero-text">
+                <div class="tagline">🔬 Инженерное бюро №1</div>
+                <h1>
+                    СОЗДАЁМ<br>
+                    <span class="highlight-city">РОБОТОВ</span><br>
+                    В БОРОВИЧАХ
+                </h1>
+                <p>
+                    <strong>Локальный хай-тек.</strong> Проектируем, строим и программируем 
+                    промышленных и сервисных роботов прямо здесь, в городе Боровичи. 
+                    Инновации с русским инженерным характером.
+                </p>
+                <div class="cta-group">
+                    <a href="#" class="btn-primary">
+                        <span>🚀</span> Заказать робота
+                    </a>
+                    <a href="#" class="btn-secondary">
+                        <span>▶</span> Смотреть кейсы
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="robot-frame">
+                    <div class="robot-emoji">🤖</div>
+                    <div class="scan-line"></div>
+                    <div class="robot-label">● active ● v.4.2</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ПРЕИМУЩЕСТВА / ЦИФРЫ -->
+        <div class="features">
+            <div class="feature-item">
+                <div class="number">07</div>
+                <h3>Моделей</h3>
+                <p>Серийных и кастомных роботов</p>
+            </div>
+            <div class="feature-item">
+                <div class="number">100%</div>
+                <h3>Локализация</h3>
+                <p>Разработка и сборка в Боровичах</p>
+            </div>
+            <div class="feature-item">
+                <div class="number">24/7</div>
+                <h3>Поддержка</h3>
+                <p>Сервисная служба в регионе</p>
+            </div>
+        </div>
+
+        <!-- ПОДВАЛ -->
+        <footer class="footer">
+            <div>
+                &copy; 2026 BoroRobotics — <span class="city-mark">Боровичи</span>
+            </div>
+            <div>
+                <a href="#">Политика</a> &nbsp;·&nbsp; <a href="#">Карьера</a> &nbsp;·&nbsp; 
+                <span style="color:#00ffff;">+7 (816) 000-00-00</span>
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

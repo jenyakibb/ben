@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Главная — BoroRobotics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ГЛОБАЛЬНЫЙ СБРОС */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ФОН С СЕТКОЙ */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: 
+                linear-gradient(rgba(0, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* НЕОНОВЫЕ СФЕРЫ */
+        .glow-orbs {
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            filter: blur(80px);
+            animation: pulseGlow 6s ease-in-out infinite alternate;
+        }
+
+        .glow-orbs.bottom {
+            top: auto;
+            bottom: -20%;
+            right: auto;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255, 0, 200, 0.1) 0%, transparent 70%);
+            animation-delay: 3s;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* КОНТЕЙНЕР */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 30px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ШАПКА */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            text-align: center;
+            line-height: 48px;
+            font-size: 28px;
+            color: #00ffff;
+            transform: rotate(10deg);
+        }
+
+        .logo span {
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #b0b0c0;
+            text-decoration: none;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ffff;
+            transition: 0.3s;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: #00ffff;
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .btn-logout {
+            padding: 10px 28px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 40px;
+            color: #ff6666 !important;
+            font-weight: 700;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .btn-logout::after {
+            display: none !important;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 0, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+            transform: scale(1.05);
+            color: #ff4444 !important;
+        }
+
+        .city-badge {
+            background: rgba(0, 255, 255, 0.12);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #00ffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ПРИВЕТСТВИЕ */
+        .welcome-section {
+            padding: 40px 0 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .welcome-text h1 {
+            font-size: clamp(32px, 5vw, 48px);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 0%, #a0f0ff 50%, #00ffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-text p {
+            color: #8892a8;
+            font-size: 18px;
+            margin-top: 8px;
+        }
+
+        .welcome-text .user-name {
+            color: #00ffff;
+            font-weight: 700;
+        }
+
+        .welcome-stats {
+            display: flex;
+            gap: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 20px 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: 28px;
+            font-weight: 900;
+            color: #00ffff;
+            display: block;
+        }
+
+        .stat-item .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5a627a;
+            margin-top: 4px;
+        }
+
+        /* ГРИД КАРТОЧЕК */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 30px 0 40px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 30px 28px;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 60px rgba(0, 255, 255, 0.05);
+        }
+
+        .card .icon {
+            font-size: 36px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #8892a8;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .card .badge {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 4px 16px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #00ffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card .badge.orange {
+            background: rgba(255, 165, 0, 0.1);
+            border-color: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+
+        .card .badge.pink {
+            background: rgba(255, 0, 200, 0.1);
+            border-color: rgba(255, 0, 200, 0.2);
+            color: #ff66d0;
+        }
+
+        .card .badge.green {
+            background: rgba(0, 255, 100, 0.1);
+            border-color: rgba(0, 255, 100, 0.2);
+            color: #66ff88;
+        }
+
+        .card .card-link {
+            display: inline-block;
+            margin-top: 16px;
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .card .card-link:hover {
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        }
+
+        /* ПОДВАЛ */
+        .footer {
+            margin-top: auto;
+            padding: 30px 0 10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            color: #5a627a;
+        }
+
+        .footer .city-mark {
+            color: #00ffff;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .footer a {
+            color: #5a627a;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer a:hover {
+            color: #00ffff;
+        }
+
+        /* АНИМАЦИЯ ЗАГРУЗКИ */
+        .loading-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* АДАПТИВ */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                align-items: start;
+            }
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            .welcome-section {
+                flex-direction: column;
+                align-items: start;
+            }
+            .welcome-stats {
+                width: 100%;
+                justify-content: space-around;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 15px;
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .welcome-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .welcome-text h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ФОН -->
+    <div class="grid-background"></div>
+    <div class="glow-orbs"></div>
+    <div class="glow-orbs bottom"></div>
+
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div class="container">
+
+        <!-- НАВИГАЦИЯ -->
+        <header class="navbar">
+            <a href="dashboard.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span>BORO</span>ROBOTICS
+            </a>
+            <div class="nav-links">
+                <a href="dashboard.html" class="active">🏠 Главная</a>
+                <a href="index.html">🚀 О нас</a>
+                <a href="#">📊 Проекты</a>
+                <a href="#">⚙️ Настройки</a>
+                <a href="login.html" class="btn-logout">🚪 Выйти</a>
+            </div>
+            <div class="city-badge">
+                🏙️ Боровичи
+            </div>
+        </header>
+
+        <!-- ПРИВЕТСТВИЕ -->
+        <section class="welcome-section">
+            <div class="welcome-text">
+                <h1>👋 Добро пожаловать!</h1>
+                <p>
+                    <span class="user-name">Иван Петров</span>, 
+                    вы в личном кабинете BoroRobotics
+                </p>
+            </div>
+            <div class="welcome-stats">
+                <div class="stat-item">
+                    <span class="number">3</span>
+                    <span class="label">Активных проекта</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">12</span>
+                    <span class="label">Завершённых</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">4.8</span>
+                    <span class="label">⭐ Рейтинг</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ГРИД КАРТОЧЕК -->
+        <div class="dashboard-grid">
+
+            <div class="card" onclick="window.location.href='index.html'">
+                <span class="icon">🤖</span>
+                <h3>Мои роботы</h3>
+                <p>Управляйте своими проектами, отслеживайте статус сборки и загружайте новые модели.</p>
+                <span class="badge green">3 активных</span>
+                <div class="card-link">Перейти →</div>
+            </div>
+
+            <div class="card" onclick="window.location.href='index.html'">
+                <span class="icon">📋</span>
+                <h3>Заказы</h3>
+                <p>История заказов, текущие разработки и новые запросы от клиентов.</p>
+                <span class="badge orange">2 в работе</span>
+                <div class="card-link">Перейти →</div>
+            </div>
+
+            <div class="card" onclick="window.location.href='index.html'">
+                <span class="icon">👥</span>
+                <h3>Команда</h3>
+                <p>Ваша инженерная команда. Связь, задачи и общие проекты в одном месте.</p>
+                <span class="badge">5 участников</span>
+                <div class="card-link">Перейти →</div>
+            </div>
+
+            <div class="card" onclick="window.location.href='index.html'">
+                <span class="icon">📊</span>
+                <h3>Аналитика</h3>
+                <p>Производительность, метрики и отчёты по вашим робототехническим проектам.</p>
+                <span class="badge pink">Обновлено</span>
+                <div class="card-link">Перейти →</div>
+            </div>
+
+            <div class="card" onclick="window.location.href='index.html'">
+                <span class="icon">🔧</span>
+                <h3>Техподдержка</h3>
+                <p>Обращения, баг-репорты и технические вопросы. Ответы в течение часа.</p>
+                <span class="badge orange">1 новый</span>
+                <div class="card-link">Перейти →</div>
+            </div>
+
+            <div class="card" onclick="window.location.href='login.html'">
+                <span class="icon">⚙️</span>
+                <h3>Настройки</h3>
+                <p>Личные данные, безопасность, уведомления и настройки профиля.</p>
+                <span class="badge">Обновить</span>
+                <div class="card-link">Перейти →</div>
+            </div>
+
+        </div>
+
+        <!-- ПОДВАЛ -->
+        <footer class="footer">
+            <div>
+                &copy; 2026 BoroRobotics — <span class="city-mark">Боровичи</span>
+            </div>
+            <div>
+                <a href="#">Политика</a> &nbsp;·&nbsp; <a href="#">Карьера</a> &nbsp;·&nbsp; 
+                <span style="color:#00ffff;">+7 (816) 000-00-00</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Имитация загрузки данных (для демонстрации)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Можно добавить анимацию загрузки или данные с сервера
+            console.log('📊 Дашборд BoroRobotics загружен');
+
+            // Если пользователь не авторизован — перенаправить на вход
+            // (для демонстрации просто проверяем наличие параметра в URL)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('logout')) {
+                alert('🚪 Вы вышли из системы');
+                window.location.href = 'login.html';
+            }
+
+            // Обработка кликов по карточкам с эффектом
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Если клик не по ссылке внутри карточки
+                    if (!e.target.closest('.card-link')) {
+                        this.style.transform = 'scale(0.98)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 200);
+                    }
+                });
+            });
+        });
+
+        // Функция для выхода (можно вызвать из любого места)
+        function logout() {
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наши роботы — BoroRobotics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ГЛОБАЛЬНЫЙ СБРОС */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0f;
+            color: #e0e0e0;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        /* ФОН - СЕТКА */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: 
+                linear-gradient(rgba(0, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* НЕОНОВЫЕ СФЕРЫ */
+        .glow-orbs {
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            filter: blur(80px);
+            animation: pulseGlow 6s ease-in-out infinite alternate;
+        }
+
+        .glow-orbs.bottom {
+            top: auto;
+            bottom: -20%;
+            right: auto;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255, 0, 200, 0.1) 0%, transparent 70%);
+            animation-delay: 3s;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* КОНТЕЙНЕР */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 30px 40px;
+            min-height: 100vh;
+        }
+
+        /* ШАПКА */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            text-align: center;
+            line-height: 48px;
+            font-size: 28px;
+            color: #00ffff;
+            transform: rotate(10deg);
+        }
+
+        .logo span {
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #b0b0c0;
+            text-decoration: none;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ffff;
+            transition: 0.3s;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: #00ffff;
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .btn-login-nav {
+            padding: 10px 28px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 40px;
+            color: #00ffff !important;
+            font-weight: 700;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .btn-login-nav::after {
+            display: none !important;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .city-badge {
+            background: rgba(0, 255, 255, 0.12);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #00ffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ЗАГОЛОВОК СТРАНИЦЫ */
+        .page-header {
+            padding: 40px 0 30px;
+        }
+
+        .page-header h1 {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0f0ff 50%, #00ffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            color: #8892a8;
+            font-size: 18px;
+            margin-top: 8px;
+        }
+
+        .page-header .city-tag {
+            color: #00ffff;
+            font-weight: 700;
+        }
+
+        /* ФИЛЬТРЫ */
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 24px 0 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .filter-btn {
+            padding: 10px 24px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            color: #7a829a;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #e0e0e0;
+        }
+
+        .filter-btn.active {
+            background: rgba(0, 255, 255, 0.12);
+            border-color: rgba(0, 255, 255, 0.3);
+            color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.05);
+        }
+
+        /* СЕТКА КАРТОЧЕК РОБОТОВ */
+        .robots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        /* КАРТОЧКА РОБОТА */
+        .robot-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 28px 24px 24px;
+            transition: 0.4s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .robot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.03), transparent 50%);
+            opacity: 0;
+            transition: 0.4s;
+        }
+
+        .robot-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 255, 255, 0.03);
+        }
+
+        .robot-card:hover::before {
+            opacity: 1;
+        }
+
+        .robot-card .card-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0, 255, 255, 0.12);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            color: #00ffff;
+        }
+
+        .robot-card .card-badge.popular {
+            background: rgba(255, 0, 200, 0.15);
+            border-color: rgba(255, 0, 200, 0.3);
+            color: #ff66d0;
+        }
+
+        .robot-card .robot-icon {
+            font-size: 72px;
+            text-align: center;
+            padding: 16px 0;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.1));
+        }
+
+        .robot-card h3 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            margin: 8px 0 6px;
+        }
+
+        .robot-card .model-code {
+            font-size: 13px;
+            color: #5a627a;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .robot-card .description {
+            color: #8892a8;
+            font-size: 15px;
+            margin: 12px 0 16px;
+            line-height: 1.6;
+        }
+
+        .robot-card .specs {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 12px 0 16px;
+            padding: 12px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .robot-card .spec-item {
+            font-size: 13px;
+            color: #7a829a;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .robot-card .spec-item strong {
+            color: #e0e0e0;
+        }
+
+        .robot-card .card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-card {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            color: #b0b8c8;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .btn-card.primary {
+            background: linear-gradient(135deg, rgba(0, 200, 255, 0.15), rgba(0, 100, 255, 0.15));
+            border-color: rgba(0, 200, 255, 0.2);
+            color: #00ccff;
+        }
+
+        .btn-card.primary:hover {
+            background: linear-gradient(135deg, rgba(0, 200, 255, 0.25), rgba(0, 100, 255, 0.25));
+            box-shadow: 0 0 30px rgba(0, 200, 255, 0.1);
+        }
+
+        /* ПОДВАЛ */
+        .footer {
+            margin-top: 30px;
+            padding: 30px 0 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            color: #5a627a;
+        }
+
+        .footer .city-mark {
+            color: #00ffff;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .footer a {
+            color: #5a627a;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer a:hover {
+            color: #00ffff;
+        }
+
+        /* АДАПТИВ */
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                align-items: start;
+            }
+            .nav-links {
+                gap: 15px;
+            }
+            .robots-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .container {
+                padding: 15px;
+            }
+            .robots-grid {
+                grid-template-columns: 1fr;
+            }
+            .filters {
+                gap: 8px;
+            }
+            .filter-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ФОН -->
+    <div class="grid-background"></div>
+    <div class="glow-orbs"></div>
+    <div class="glow-orbs bottom"></div>
+
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div class="container">
+
+        <!-- НАВИГАЦИЯ -->
+        <header class="navbar">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span>BORO</span>ROBOTICS
+            </a>
+            <div class="nav-links">
+                <a href="robots.html" class="active">Роботы</a>
+                <a href="#">Технологии</a>
+                <a href="#">Проекты</a>
+                <a href="order.html">Заявка</a>
+                <a href="#">Контакты</a>
+                <a href="login.html" class="btn-login-nav">🔐 Войти</a>
+            </div>
+            <div class="city-badge">
+                🏙️ Боровичи
+            </div>
+        </header>
+
+        <!-- ЗАГОЛОВОК СТРАНИЦЫ -->
+        <div class="page-header">
+            <h1>Наши роботы</h1>
+            <p>
+                Создано инженерами в <span class="city-tag">Боровичах</span> — 
+                от промышленных гигантов до умных помощников
+            </p>
+        </div>
+
+        <!-- ФИЛЬТРЫ -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all" onclick="filterRobots('all')">Все</button>
+            <button class="filter-btn" data-filter="industrial" onclick="filterRobots('industrial')">Промышленные</button>
+            <button class="filter-btn" data-filter="service" onclick="filterRobots('service')">Сервисные</button>
+            <button class="filter-btn" data-filter="education" onclick="filterRobots('education')">Образовательные</button>
+            <button class="filter-btn" data-filter="agriculture" onclick="filterRobots('agriculture')">Агро-роботы</button>
+        </div>
+
+        <!-- СЕТКА КАРТОЧЕК -->
+        <div class="robots-grid" id="robotsGrid">
+            <!-- Карточки будут вставлены через JavaScript -->
+        </div>
+
+        <!-- ПОДВАЛ -->
+        <footer class="footer">
+            <div>
+                &copy; 2026 BoroRobotics — <span class="city-mark">Боровичи</span>
+            </div>
+            <div>
+                <a href="#">Политика</a> &nbsp;·&nbsp; <a href="#">Карьера</a> &nbsp;·&nbsp; 
+                <span style="color:#00ffff;">+7 (816) 000-00-00</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // ДАННЫЕ РОБОТОВ
+        const robotsData = [
+            {
+                id: 1,
+                name: 'Boro-Industrial X7',
+                model: 'BI-X7',
+                category: 'industrial',
+                icon: '🏭',
+                badge: 'Популярный',
+                badgeType: 'popular',
+                description: 'Мощный промышленный робот для тяжёлых производственных задач. Грузоподъёмность до 500 кг.',
+                specs: {
+                    'Грузоподъёмность': '500 кг',
+                    'Достижимость': '±0.02 мм',
+                    'Энергия': '380В'
+                }
+            },
+            {
+                id: 2,
+                name: 'Boro-Service S4',
+                model: 'BS-S4',
+                category: 'service',
+                icon: '🤖',
+                badge: 'Новинка',
+                badgeType: '',
+                description: 'Умный сервисный робот для офисов и торговых центров. Навигация в людных местах.',
+                specs: {
+                    'Автономность': '12 ч',
+                    'Скорость': '2 м/с',
+                    'Датчики': 'LiDAR + Vision'
+                }
+            },
+            {
+                id: 3,
+                name: 'Boro-Edu Junior',
+                model: 'BE-JR',
+                category: 'education',
+                icon: '🧠',
+                badge: 'Для школ',
+                badgeType: '',
+                description: 'Образовательный робот для изучения робототехники и программирования в школах.',
+                specs: {
+                    'Возраст': '10+ лет',
+                    'Языки': 'Python, Scratch',
+                    'Модули': '8 шт'
+                }
+            },
+            {
+                id: 4,
+                name: 'Boro-Agro Titan',
+                model: 'BA-TN',
+                category: 'agriculture',
+                icon: '🌾',
+                badge: 'Агро-лидер',
+                badgeType: 'popular',
+                description: 'Автономный робот для сельского хозяйства. Обработка полей и сбор данных.',
+                specs: {
+                    'Площадь': 'до 50 га',
+                    'Датчики': 'Спектр + GPS',
+                    'Вес': '180 кг'
+                }
+            },
+            {
+                id: 5,
+                name: 'Boro-Industrial X5',
+                model: 'BI-X5',
+                category: 'industrial',
+                icon: '⚙️',
+                badge: 'Сварка',
+                badgeType: '',
+                description: 'Специализированный робот для сварочных работ на производстве. Высокая точность.',
+                specs: {
+                    'Ток': 'до 400А',
+                    'Скорость': '1.5 м/с',
+                    'Защита': 'IP67'
+                }
+            },
+            {
+                id: 6,
+                name: 'Boro-Service Med',
+                model: 'BS-MD',
+                category: 'service',
+                icon: '🏥',
+                badge: 'Медицина',
+                badgeType: '',
+                description: 'Помощник в медицинских учреждениях. Доставка препаратов и анализ данных.',
+                specs: {
+                    'Доставка': 'до 30 кг',
+                    'Стерильность': 'УФ-обработка',
+                    'Связь': '5G'
+                }
+            },
+            {
+                id: 7,
+                name: 'Boro-Edu Pro',
+                model: 'BE-PR',
+                category: 'education',
+                icon: '💻',
+                badge: 'Студенты',
+                badgeType: '',
+                description: 'Профессиональный образовательный робот для вузов. Робототехника и ИИ.',
+                specs: {
+                    'Процессор': 'NVIDIA Jetson',
+                    'Камера': '4K Stereo',
+                    'ROS': 'Поддержка'
+                }
+            },
+            {
+                id: 8,
+                name: 'Boro-Agro Scout',
+                model: 'BA-SC',
+                category: 'agriculture',
+                icon: '🚜',
+                badge: 'Мониторинг',
+                badgeType: '',
+                description: 'Дрон-робот для мониторинга полей с ИИ-анализом состояния культур.',
+                specs: {
+                    'Время': '2 ч',
+                    'Камера': 'Мультиспектр',
+                    'Диапазон': 'до 5 км'
+                }
+            },
+            {
+                id: 9,
+                name: 'Boro-Service Home',
+                model: 'BS-HM',
+                category: 'service',
+                icon: '🏠',
+                badge: 'Для дома',
+                badgeType: 'popular',
+                description: 'Домашний помощник. Умная уборка, безопасность и управление домом.',
+                specs: {
+                    'Пылесборник': '0.6 л',
+                    'Влажная уборка': 'Да',
+                    'Голос': 'Ассистент'
+                }
+            }
+        ];
+
+        // Рендеринг карточек
+        function renderRobots(robots) {
+            const grid = document.getElementById('robotsGrid');
+            grid.innerHTML = '';
+
+            robots.forEach(robot => {
+                const card = document.createElement('div');
+                card.className = 'robot-card';
+                card.setAttribute('data-category', robot.category);
+
+                // Сборка спецификаций
+                let specsHtml = '';
+                for (const [key, value] of Object.entries(robot.specs)) {
+                    specsHtml += `
+                        <div class="spec-item">
+                            <strong>${key}:</strong> ${value}
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="card-badge ${robot.badgeType}">${robot.badge}</div>
+                    <div class="robot-icon">${robot.icon}</div>
+                    <h3>${robot.name}</h3>
+                    <div class="model-code">${robot.model}</div>
+                    <p class="description">${robot.description}</p>
+                    <div class="specs">
+                        ${specsHtml}
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-card primary" onclick="alert('Заявка на ${robot.name} отправлена!')">
+                            📩 Заказать
+                        </button>
+                        <button class="btn-card" onclick="alert('Подробнее о ${robot.name}')">
+                            Подробнее
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Фильтрация
+        function filterRobots(category) {
+            // Обновляем активные кнопки
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-filter') === category) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Фильтруем данные
+            let filtered = robotsData;
+            if (category !== 'all') {
+                filtered = robotsData.filter(r => r.category === category);
+            }
+
+            renderRobots(filtered);
+        }
+
+        // Инициализация
+        renderRobots(robotsData);
+    </script>
+
+</body>
+</html>

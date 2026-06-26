@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Заявка на робота — BoroRobotics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ГЛОБАЛЬНЫЙ СБРОС */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ФОН - СЕТКА */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: 
+                linear-gradient(rgba(0, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* НЕОНОВЫЕ СФЕРЫ */
+        .glow-orbs {
+            position: fixed;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            filter: blur(80px);
+            animation: pulseGlow 6s ease-in-out infinite alternate;
+        }
+
+        .glow-orbs.bottom {
+            top: auto;
+            bottom: -20%;
+            right: auto;
+            left: -10%;
+            background: radial-gradient(circle, rgba(255, 0, 200, 0.1) 0%, transparent 70%);
+            animation-delay: 3s;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* КОНТЕЙНЕР */
+        .container {
+            position: relative;
+            z-index: 10;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 30px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ШАПКА */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0 30px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            display: inline-block;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            background: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            text-align: center;
+            line-height: 48px;
+            font-size: 28px;
+            color: #00ffff;
+            transform: rotate(10deg);
+        }
+
+        .logo span {
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #b0b0c0;
+            text-decoration: none;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00ffff;
+            transition: 0.3s;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: #00ffff;
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        .btn-login-nav {
+            padding: 10px 28px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 40px;
+            color: #00ffff !important;
+            font-weight: 700;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .btn-login-nav::after {
+            display: none !important;
+        }
+
+        .btn-login-nav:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .city-badge {
+            background: rgba(0, 255, 255, 0.12);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #00ffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ОСНОВНОЙ КОНТЕНТ */
+        .order-content {
+            display: flex;
+            gap: 60px;
+            padding: 40px 0 30px;
+            flex: 1;
+            align-items: flex-start;
+        }
+
+        /* ЛЕВАЯ ЧАСТЬ - ИНФО */
+        .order-info {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .order-info h1 {
+            font-size: clamp(40px, 5vw, 56px);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff 0%, #a0f0ff 50%, #00ffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .order-info .subtitle {
+            font-size: 18px;
+            color: #8892a8;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .order-info .subtitle strong {
+            color: #00ffff;
+            font-weight: 700;
+        }
+
+        .info-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .info-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            transition: 0.3s;
+        }
+
+        .info-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(0, 255, 255, 0.15);
+        }
+
+        .info-card .icon {
+            font-size: 28px;
+            min-width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 255, 255, 0.06);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .info-card h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .info-card p {
+            font-size: 14px;
+            color: #7a829a;
+        }
+
+        /* ПРАВАЯ ЧАСТЬ - ФОРМА */
+        .order-form-wrapper {
+            flex: 1.2;
+            max-width: 600px;
+            min-width: 300px;
+        }
+
+        .order-card {
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 0 80px rgba(0, 255, 255, 0.05), inset 0 0 80px rgba(0, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 255, 255, 0.15), transparent, rgba(255, 0, 200, 0.15), transparent);
+            border-radius: 32px;
+            z-index: -1;
+            animation: spinBorder 10s linear infinite;
+        }
+
+        @keyframes spinBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .order-card .form-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .order-card .form-subtitle {
+            color: #5a627a;
+            font-size: 14px;
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #5a627a;
+            margin-bottom: 8px;
+        }
+
+        .form-group label .required {
+            color: #ff4d6a;
+            margin-left: 4px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: rgba(0, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.05);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #3a3f50;
+        }
+
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a627a' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #1a1a24;
+            color: #e0e0e0;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* ЧЕКБОКС */
+        .form-group.checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .form-group.checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            accent-color: #00ffff;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+
+        .form-group.checkbox label {
+            font-size: 14px;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+            color: #7a829a;
+            cursor: pointer;
+        }
+
+        .form-group.checkbox label a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+
+        .form-group.checkbox label a:hover {
+            text-decoration: underline;
+        }
+
+        /* КНОПКА ОТПРАВКИ */
+        .btn-submit {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00ccff, #0088ff);
+            border: none;
+            border-radius: 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #0a0a0f;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 40px rgba(0, 150, 255, 0.3);
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 60px rgba(0, 200, 255, 0.5);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .btn-submit .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(10, 10, 15, 0.2);
+            border-top: 3px solid #0a0a0f;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-submit.loading .btn-text {
+            display: none;
+        }
+
+        .btn-submit.loading .spinner {
+            display: block;
+        }
+
+        /* УСПЕШНОЕ СООБЩЕНИЕ */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .success-message .big-icon {
+            font-size: 72px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .success-message h3 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #00ffff;
+            margin-bottom: 8px;
+        }
+
+        .success-message p {
+            color: #7a829a;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .success-message .btn-reset {
+            margin-top: 20px;
+            padding: 12px 36px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #b0b8c8;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .success-message .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* ПОДВАЛ */
+        .footer {
+            margin-top: 30px;
+            padding: 30px 0 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 14px;
+            color: #5a627a;
+        }
+
+        .footer .city-mark {
+            color: #00ffff;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .footer a {
+            color: #5a627a;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .footer a:hover {
+            color: #00ffff;
+        }
+
+        /* АДАПТИВ */
+        @media (max-width: 1024px) {
+            .order-content {
+                flex-direction: column;
+            }
+            .order-info {
+                max-width: 100%;
+            }
+            .order-form-wrapper {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .navbar {
+                flex-direction: column;
+                align-items: start;
+            }
+            .nav-links {
+                gap: 15px;
+            }
+            .order-card {
+                padding: 28px 20px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 15px;
+            }
+            .order-card {
+                padding: 20px 16px;
+            }
+            .order-info h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ФОН -->
+    <div class="grid-background"></div>
+    <div class="glow-orbs"></div>
+    <div class="glow-orbs bottom"></div>
+
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div class="container">
+
+        <!-- НАВИГАЦИЯ -->
+        <header class="navbar">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span>BORO</span>ROBOTICS
+            </a>
+            <div class="nav-links">
+                <a href="robots.html">Роботы</a>
+                <a href="#">Технологии</a>
+                <a href="#">Проекты</a>
+                <a href="#" class="active">Заявка</a>
+                <a href="login.html" class="btn-login-nav">🔐 Войти</a>
+            </div>
+            <div class="city-badge">
+                🏙️ Боровичи
+            </div>
+        </header>
+
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <div class="order-content">
+
+            <!-- ЛЕВАЯ ЧАСТЬ - ИНФОРМАЦИЯ -->
+            <div class="order-info">
+                <h1>Заявка на<br>робота</h1>
+                <p class="subtitle">
+                    Закажите готового робота или разработайте <strong>кастомное решение</strong> 
+                    для вашего бизнеса. Инженеры BoroRobotics в Боровичах реализуют любой проект.
+                </p>
+
+                <div class="info-cards">
+                    <div class="info-card">
+                        <div class="icon">⚡</div>
+                        <div>
+                            <h4>Быстрый ответ</h4>
+                            <p>Ответим в течение 2 часов в рабочее время</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="icon">🛠️</div>
+                        <div>
+                            <h4>Индивидуальный подход</h4>
+                            <p>Разработаем робота под ваши задачи</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="icon">🏙️</div>
+                        <div>
+                            <h4>Локальное производство</h4>
+                            <p>Сборка в Боровичах — быстрая доставка по России</p>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="icon">🔒</div>
+                        <div>
+                            <h4>Гарантия 2 года</h4>
+                            <p>Полная гарантия на все компоненты</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ПРАВАЯ ЧАСТЬ - ФОРМА -->
+            <div class="order-form-wrapper">
+                <div class="order-card">
+
+                    <!-- ФОРМА -->
+                    <div id="orderFormContainer">
+                        <div class="form-title">🚀 Создать заявку</div>
+                        <div class="form-subtitle">Заполните форму, и мы свяжемся с вами</div>
+
+                        <form id="orderForm" onsubmit="submitOrder(event)">
+                            <!-- Имя -->
+                            <div class="form-group">
+                                <label>Ваше имя <span class="required">*</span></label>
+                                <input type="text" id="name" placeholder="Иван Петров" required>
+                            </div>
+
+                            <!-- Email и телефон в ряд -->
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Email <span class="required">*</span></label>
+                                    <input type="email" id="email" placeholder="ivan@company.ru" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Телефон <span class="required">*</span></label>
+                                    <input type="tel" id="phone" placeholder="+7 (999) 123-45-67" required>
+                                </div>
+                            </div>
+
+                            <!-- Тип робота -->
+                            <div class="form-group">
+                                <label>Тип робота <span class="required">*</span></label>
+                                <select id="robotType" required>
+                                    <option value="">Выберите тип...</option>
+                                    <option value="industrial">Промышленный</option>
+                                    <option value="service">Сервисный</option>
+                                    <option value="education">Образовательный</option>
+                                    <option value="agriculture">Агро-робот</option>
+                                    <option value="custom">Кастомный проект</option>
+                                    <option value="other">Другое</option>
+                                </select>
+                            </div>
+
+                            <!-- Модель -->
+                            <div class="form-group">
+                                <label>Модель (если известна)</label>
+                                <select id="robotModel">
+                                    <option value="">Выберите модель...</option>
+                                    <option value="bi-x7">Boro-Industrial X7</option>
+                                    <option value="bi-x5">Boro-Industrial X5</option>
+                                    <option value="bs-s4">Boro-Service S4</option>
+                                    <option value="bs-md">Boro-Service Med</option>
+                                    <option value="bs-hm">Boro-Service Home</option>
+                                    <option value="be-jr">Boro-Edu Junior</option>
+                                    <option value="be-pr">Boro-Edu Pro</option>
+                                    <option value="ba-tn">Boro-Agro Titan</option>
+                                    <option value="ba-sc">Boro-Agro Scout</option>
+                                    <option value="custom">Кастомная разработка</option>
+                                </select>
+                            </div>
+
+                            <!-- Сообщение -->
+                            <div class="form-group">
+                                <label>Описание задачи</label>
+                                <textarea id="message" placeholder="Расскажите, для чего вам нужен робот, какие задачи он должен решать..."></textarea>
+                            </div>
+
+                            <!-- Согласие -->
+                            <div class="form-group checkbox">
+                                <input type="checkbox" id="agreement" required>
+                                <label for="agreement">
+                                    Я согласен на обработку персональных данных и принимаю 
+                                    <a href="#" target="_blank">условия использования</a>
+                                    <span style="color:#ff4d6a;">*</span>
+                                </label>
+                            </div>
+
+                            <!-- Кнопка -->
+                            <button type="submit" class="btn-submit" id="submitBtn">
+                                <span class="btn-text">📩 Отправить заявку</span>
+                                <span class="spinner"></span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- УСПЕШНОЕ СООБЩЕНИЕ -->
+                    <div id="successMessage" class="success-message">
+                        <span class="big-icon">✅</span>
+                        <h3>Заявка отправлена!</h3>
+                        <p>
+                            Спасибо! Наш инженер свяжется с вами в ближайшее время.<br>
+                            <span style="color:#5a627a; font-size:14px;">Обычно мы отвечаем в течение 2 часов</span>
+                        </p>
+                        <button class="btn-reset" onclick="resetForm()">📝 Создать новую заявку</button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ПОДВАЛ -->
+        <footer class="footer">
+            <div>
+                &copy; 2026 BoroRobotics — <span class="city-mark">Боровичи</span>
+            </div>
+            <div>
+                <a href="#">Политика</a> &nbsp;·&nbsp; <a href="#">Карьера</a> &nbsp;·&nbsp; 
+                <span style="color:#00ffff;">+7 (816) 000-00-00</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // ФУНКЦИЯ ОТПРАВКИ ЗАЯВКИ
+        function submitOrder(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('orderForm');
+            const btn = document.getElementById('submitBtn');
+            const formContainer = document.getElementById('orderFormContainer');
+            const successMsg = document.getElementById('successMessage');
+
+            // Простая валидация
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const robotType = document.getElementById('robotType').value;
+            const agreement = document.getElementById('agreement').checked;
+
+            if (!name || !email || !phone || !robotType || !agreement) {
+                alert('⚠️ Пожалуйста, заполните все обязательные поля (отмечены *)');
+                return;
+            }
+
+            // Имитация отправки
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Скрываем форму, показываем успех
+                formContainer.style.display = 'none';
+                successMsg.style.display = 'block';
+
+                // Собираем данные для демо
+                const data = {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    robotType: robotType,
+                    model: document.getElementById('robotModel').value,
+                    message: document.getElementById('message').value
+                };
+
+                console.log('📦 Данные заявки:', data);
+
+                // Сброс состояния кнопки
+                btn.classList.remove('loading');
+                btn.disabled = false;
+
+                // Можно отправить данные на сервер:
+                // fetch('/api/order', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(data)
+                // });
+
+            }, 2000);
+        }
+
+        // СБРОС ФОРМЫ
+        function resetForm() {
+            const form = document.getElementById('orderForm');
+            const formContainer = document.getElementById('orderFormContainer');
+            const successMsg = document.getElementById('successMessage');
+
+            // Очищаем форму
+            form.reset();
+
+            // Возвращаем форму
+            formContainer.style.display = 'block';
+            successMsg.style.display = 'none';
+
+            // Прокрутка к форме
+            document.querySelector('.order-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // ВАЛИДАЦИЯ ТЕЛЕФОНА (маска для удобства)
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.startsWith('7') || value.startsWith('8')) {
+                    if (value.length > 1) {
+                        let formatted = '+7 (';
+                        if (value.startsWith('8')) {
+                            formatted = '+7 (';
+                            value = '7' + value.substring(1);
+                        }
+                        if (value.length > 1) {
+                            formatted += value.substring(1, 4);
+                        }
+                        if (value.length >= 4) {
+                            formatted += ') ';
+                            formatted += value.substring(4, 7);
+                        }
+                        if (value.length >= 7) {
+                            formatted += '-';
+                            formatted += value.substring(7, 9);
+                        }
+                        if (value.length >= 9) {
+                            formatted += '-';
+                            formatted += value.substring(9, 11);
+                        }
+                        this.value = formatted;
+                    } else {
+                        this.value = '+7 (';
+                    }
+                } else {
+                    this.value = '+7 (' + value;
+                }
+            } else {
+                this.value = '';
+            }
+        });
+
+        // АВТОМАТИЧЕСКАЯ ЗАГРУЗКА МОДЕЛИ ПРИ ВЫБОРЕ ТИПА
+        document.getElementById('robotType').addEventListener('change', function() {
+            const modelSelect = document.getElementById('robotModel');
+            const type = this.value;
+
+            // Сброс
+            modelSelect.value = '';
+
+            // Если выбран кастомный тип — предлагаем кастомную модель
+            if (type === 'custom') {
+                modelSelect.value = 'custom';
+            } else {
+                // Можно добавить логику подбора модели по типу
+                const modelMap = {
+                    'industrial': ['bi-x7', 'bi-x5'],
+                    'service': ['bs-s4', 'bs-md', 'bs-hm'],
+                    'education': ['be-jr', 'be-pr'],
+                    'agriculture': ['ba-tn', 'ba-sc']
+                };
+
+                if (modelMap[type]) {
+                    // Просто подсветка, но не принуждаем
+                }
+            }
+        });
+
+        // ПОДСКАЗКА ПРИ НАВЕДЕНИИ НА ПОЛЯ
+        document.querySelectorAll('.form-group input, .form-group select, .form-group textarea').forEach(el => {
+            el.addEventListener('focus', function() {
+                this.parentElement.querySelector('label')?.style.setProperty('color', '#00ffff');
+            });
+            el.addEventListener('blur', function() {
+                this.parentElement.querySelector('label')?.style.setProperty('color', '#5a627a');
+            });
+        });
+    </script>
+
+</body>
+</html>
